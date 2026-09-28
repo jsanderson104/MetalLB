@@ -1,0 +1,18 @@
+# This file is for after MetalLB is installed. This will configure the DHCP IP-POOL range that MetalLB will issue to the services when "LoadBalancer" Selector type is used.
+# Notice the variable below - it is being passed via the Kubecluster role i developed. You can easily add a vars section to thie file and set the range.
+# Example pool: 192.168.1.200-192.168.1.250
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - {{v_loadbalancer_iprange}}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: example
+  namespace: metallb-system
