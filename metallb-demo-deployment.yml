@@ -1,0 +1,35 @@
+# this file will deploy a demo application to show that the IP addresses inside the cluster are being load-balanced via MetalLB. The expected behavior is the IP listed on the page should change every few seconds.
+# "replicas" value below should equal the amount of worker nodes you have to test that all of them are participating in the balancer.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metallb-demo
+spec:
+  replicas: {{groups['workers']|length}}
+  selector:
+    matchLabels:
+      run: metallb-demo
+  template:
+    metadata:
+      labels:
+        run: metallb-demo
+    spec:
+      containers:
+      - name: metallb-demo
+        image: klimenta/serverip
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadbalancer
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    run: metallb-demo
